@@ -93,14 +93,42 @@ export default class RobotService {
           }
         }
         case "B": {
+          if (this.robotVersion !== 1) {
+            if (this.robotSensorService.positionedInGrid(currentPosition)) {
+              this.robotSensorService.moveBackwards(
+                currentPosition,
+                rotationAxis,
+                0
+              );
+
+              currentPosition.Y++;
+              break;
+            } else if (
+              this.robotSensorService.inTheCorner(currentPosition, rotationAxis)
+            ) {
+              currentPosition.Y++;
+              break;
+            } else if (
+              this.robotSensorService.movingOnTheEdge(
+                currentPosition,
+                rotationAxis
+              )
+            ) {
+              currentPosition.Y++;
+              break;
+            } else {
+              break;
+            }
+          } else {
+            currentPosition.X++;
+            break;
+          }
+
           break;
         }
         case "R": {
           if (this.robotVersion !== 1) {
-            rotationAxis = this.robotSensorService.rotateRobot(
-              rotationAxis,
-              "R"
-            );
+            rotationAxis = this.robotSensorService.rotateRobot(rotationAxis, 0);
           } else {
             if (currentPosition.X >= 0 && currentPosition.X < this.gridSize.X) {
               currentPosition.X++;
@@ -112,10 +140,7 @@ export default class RobotService {
         }
         case "L": {
           if (this.robotVersion !== 1) {
-            rotationAxis = this.robotSensorService.rotateRobot(
-              rotationAxis,
-              "L"
-            );
+            rotationAxis = this.robotSensorService.rotateRobot(rotationAxis, 1);
           } else {
             if (currentPosition.X !== 0) {
               currentPosition.X++;

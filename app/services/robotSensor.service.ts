@@ -1,4 +1,4 @@
-import { I2DVector } from "../modules";
+import { I2DVector, Location, Direction } from "../modules";
 
 export default class RobotSensorService {
   private gridSize: I2DVector;
@@ -33,7 +33,7 @@ export default class RobotSensorService {
     }
 
     // (0, MAX Y)
-    if (currentPosition.X === 0 && currentPosition.Y === this.gridSize.Y) {
+    else if (currentPosition.X === 0 && currentPosition.Y === this.gridSize.Y) {
       if (rotation === 0 || rotation === 90 || rotation === -90) {
         return true;
       } else {
@@ -42,7 +42,7 @@ export default class RobotSensorService {
     }
 
     //(MAX X, 0)
-    if (currentPosition.X === this.gridSize.X && currentPosition.Y === 0) {
+    else if (currentPosition.X === this.gridSize.X && currentPosition.Y === 0) {
       if (rotation === 180 || rotation === 90) {
         return true;
       } else {
@@ -51,7 +51,7 @@ export default class RobotSensorService {
     }
 
     //(MAX, MAX)
-    if (
+    else if (
       currentPosition.X === this.gridSize.X &&
       currentPosition.Y === this.gridSize.Y
     ) {
@@ -82,7 +82,7 @@ export default class RobotSensorService {
     }
 
     // checking on the line movement i.e. (90,0)
-    if (
+    else if (
       currentPosition.Y === 0 &&
       currentPosition.X > this.gridSize.X &&
       currentPosition.Y !== 0
@@ -95,7 +95,7 @@ export default class RobotSensorService {
     }
 
     // checking on the line movement i.e. (100,90)
-    if (
+    else if (
       currentPosition.Y === 0 &&
       currentPosition.X > this.gridSize.X &&
       currentPosition.Y !== 0
@@ -108,7 +108,7 @@ export default class RobotSensorService {
     }
 
     // checking on the line movement i.e. (50,100)
-    if (
+    else if (
       currentPosition.Y === 0 &&
       currentPosition.X > this.gridSize.X &&
       currentPosition.Y !== 0
@@ -122,47 +122,110 @@ export default class RobotSensorService {
   }
 
   // setting new rotationAxis
-  public rotateRobot(rotationAxis: number, direction: string): number {
+  public rotateRobot(rotationAxis: number, direction: Direction): number {
     let newRotationAxis: number;
 
     switch (rotationAxis) {
       case 0: {
-        if (direction === "R") {
+        if (direction === 0) {
           newRotationAxis = -90;
           break;
-        } else if (direction === "L") {
+        } else if (direction === 1) {
           newRotationAxis = 90;
+          break;
+        } else if (direction === 2) {
+          newRotationAxis = 180;
           break;
         }
       }
       case 90: {
-        if (direction === "R") {
+        if (direction === 0) {
           newRotationAxis = 0;
           break;
-        } else if (direction === "L") {
+        } else if (direction === 1) {
           newRotationAxis = 180;
           break;
-        }
-      }
-      case 180: {
-        if (direction === "R") {
-          newRotationAxis = 90;
-          break;
-        } else if (direction === "L") {
+        } else if (direction === 2) {
           newRotationAxis = -90;
           break;
         }
       }
-      case -90: {
-        if (direction === "R") {
+      case 180: {
+        if (direction === 0) {
+          newRotationAxis = 90;
+          break;
+        } else if (direction === 1) {
+          newRotationAxis = -90;
+          break;
+        } else if (direction === 2) {
           newRotationAxis = 180;
           break;
-        } else if (direction === "L") {
+        }
+      }
+      case -90: {
+        if (direction === 0) {
+          newRotationAxis = 180;
+          break;
+        } else if (direction === 1) {
           newRotationAxis = 0;
+          break;
+        } else if (direction === 2) {
+          newRotationAxis = 90;
           break;
         }
       }
     }
     return newRotationAxis;
+  }
+
+  public moveBackwards(
+    currentPosition: I2DVector,
+    rotationAxis: number,
+    location: Location
+  ): { newPosition: { currentPosition: I2DVector; rotationAxis: number } } {
+    if (location === Location.Grid) {
+      rotationAxis = this.rotateRobot(rotationAxis, Direction.Backwards);
+      if (rotationAxis === 0) {
+        currentPosition.X++;
+      } else if (rotationAxis === 180) {
+        currentPosition.X--;
+      } else if (rotationAxis === 90) {
+        currentPosition.Y++;
+      } else if (rotationAxis === -90) {
+        currentPosition.Y--;
+      }
+    } else if (location === Location.Edge) {
+      rotationAxis = this.rotateRobot(rotationAxis, Direction.Backwards);
+      if (currentPosition.X === 0) {
+      }
+      if (rotationAxis === 0) {
+        currentPosition.X++;
+      }
+      if (rotationAxis === 180) {
+        currentPosition.X--;
+      }
+      if (rotationAxis === 90) {
+        currentPosition.Y++;
+      }
+      if (rotationAxis === -90) {
+        currentPosition.Y--;
+      }
+    } else if (location === Location.Corner) {
+      rotationAxis = this.rotateRobot(rotationAxis, Direction.Backwards);
+      if (rotationAxis === 0) {
+        currentPosition.X++;
+      }
+      if (rotationAxis === 180) {
+        currentPosition.X--;
+      }
+      if (rotationAxis === 90) {
+        currentPosition.Y++;
+      }
+      if (rotationAxis === -90) {
+        currentPosition.Y--;
+      }
+    }
+
+    return { newPosition: { currentPosition, rotationAxis } };
   }
 }
