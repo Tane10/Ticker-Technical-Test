@@ -97,3 +97,13 @@ R = RIGHT
     "movementCommands": "FRRRFFFFRFRFFFRFFLRLFFFFLRFF"
 }
 ```
+
+curl --location --request POST 'http://localhost:5000/robotspiders/commands' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "startingCoordinates": {
+        "X": 10,
+        "Y": 50
+    },
+    "movementCommands": "FRRRFFFFRFRFFFRFFLRLFFFFLRFF"
+}'
