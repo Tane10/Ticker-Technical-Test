@@ -1,5 +1,5 @@
 import express, { Response, Request, NextFunction } from "express";
-import { I2DVector } from "../modules";
+import { Direction, I2DVector, IMoveRobot, Location } from "../modules";
 import RobotSensorService from "./RobotSensor.service";
 /**NOTE:
  * robot can't go in negative space
@@ -46,6 +46,8 @@ export default class RobotService {
     let rotationAxis: number = 0;
     let currentPosition = startPosition;
     let lastMove = "";
+    let currentDirection: Direction;
+    let moveRobotAction: IMoveRobot;
 
     // if we are facing the right way then move i.e. rotationAxis = 0
     // if we are in the grid then move
@@ -63,18 +65,27 @@ export default class RobotService {
     // if R +90 or L -90 from rotationAxis
     // if B -180deg then Y--
     // F X++
+    // depending on where axis is on where we increase when moving forward
 
     for (const [idx, value] of movesArray.entries()) {
       switch (value) {
         case "F": {
           if (this.robotVersion !== 1) {
             if (this.robotSensorService.positionedInGrid(currentPosition)) {
-              currentPosition.Y++;
+              currentDirection =
+                this.robotSensorService.getDirection(rotationAxis);
+
+              moveRobotAction = this.robotSensorService.moveRobot(
+                currentPosition,
+                rotationAxis,
+                Location.Grid,
+                currentDirection
+              );
+
               break;
             } else if (
               this.robotSensorService.inTheCorner(currentPosition, rotationAxis)
             ) {
-              currentPosition.Y++;
               break;
             } else if (
               this.robotSensorService.movingOnTheEdge(
@@ -82,7 +93,6 @@ export default class RobotService {
                 rotationAxis
               )
             ) {
-              currentPosition.Y++;
               break;
             } else {
               break;
@@ -95,13 +105,13 @@ export default class RobotService {
         case "B": {
           if (this.robotVersion !== 1) {
             if (this.robotSensorService.positionedInGrid(currentPosition)) {
-              this.robotSensorService.moveBackwards(
+              const newPosition = this.robotSensorService.moveBackwards(
                 currentPosition,
                 rotationAxis,
                 0
               );
 
-              currentPosition.Y++;
+              currentPosition.currentPosition.Y++;
               break;
             } else if (
               this.robotSensorService.inTheCorner(currentPosition, rotationAxis)

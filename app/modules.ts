@@ -12,5 +12,28 @@ export enum Location {
 export enum Direction {
   Right,
   Left,
-  Backwards,
+  Backward,
+  Forward,
+  Up,
+  Down,
+}
+
+export enum Sides {
+  Bottom,
+  Right,
+  Left,
+  Top,
+  BottomLeft,
+  BottomRight,
+  TopRight,
+  TopLeft,
+}
+
+export interface IRobotPlacement {
+  switch?: boolean;
+  side: Sides;
+}
+
+export interface IMoveRobot {
+  newPosition: { currentPosition: I2DVector; rotationAxis: number };
 }
