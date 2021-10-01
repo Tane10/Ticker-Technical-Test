@@ -9,6 +9,7 @@ import {
 
 export default class RobotSensorService {
   private gridSize: I2DVector;
+  public newRobotPosition: IMoveRobot;
 
   constructor(gridSize) {
     this.gridSize = gridSize;
@@ -227,12 +228,33 @@ export default class RobotSensorService {
     currentPosition: I2DVector,
     rotationAxis: number,
     location: Location,
-    direction: Direction
+    currentDirection: Direction,
+    requestedDirection: Direction
   ): IMoveRobot {
-    if (direction === Direction.Forward) {
+    if (location === Location.Grid) {
+      if (requestedDirection === Direction.Forward) {
+        switch (currentDirection) {
+          case Direction.Right: {
+            currentPosition.X++;
+            break;
+          }
+          case Direction.Up: {
+            currentPosition.Y++;
+            break;
+          }
+          case Direction.Left: {
+            currentPosition.X--;
+            break;
+          }
+          case Direction.Down: {
+            currentPosition.Y--;
+            break;
+          }
+        }
+      }
     }
 
-    if (direction === Direction.Backward)
+    if (requestedDirection === Direction.Backward)
       if (location === Location.Grid) {
         rotationAxis = this.rotateRobot(rotationAxis, Direction.Backward);
         if (rotationAxis === 0) {
@@ -262,6 +284,6 @@ export default class RobotSensorService {
         }
       }
 
-    return { newPosition: { currentPosition, rotationAxis } };
+    return this.newRobotPosition;
   }
 }

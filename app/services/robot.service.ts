@@ -75,12 +75,16 @@ export default class RobotService {
               currentDirection =
                 this.robotSensorService.getDirection(rotationAxis);
 
-              moveRobotAction = this.robotSensorService.moveRobot(
+              this.robotSensorService.moveRobot(
                 currentPosition,
                 rotationAxis,
                 Location.Grid,
-                currentDirection
+                currentDirection,
+                Direction.Forward
               );
+
+              currentPosition =
+                this.robotSensorService.newRobotPosition.position;
 
               break;
             } else if (

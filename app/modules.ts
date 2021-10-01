@@ -35,5 +35,6 @@ export interface IRobotPlacement {
 }
 
 export interface IMoveRobot {
-  newPosition: { currentPosition: I2DVector; rotationAxis: number };
+  position: I2DVector;
+  rotationAxis: number;
 }
