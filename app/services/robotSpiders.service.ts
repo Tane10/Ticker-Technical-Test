@@ -1,51 +1,56 @@
-import { Response, Request, NextFunction } from "express";
+import e, { Response, Request, NextFunction } from "express";
 
 //   private movementCommandsArray: string[] = ["F", "B", "L", "R"];
 //   private mkVersion: number = 1;
-const gridSize: { X: number; Y: number } = { X: 100, Y: 100 };
+const movementCommandsArray: string[] = ["F", "B", "L", "R"];
+const gridSize: { X: number; Y: number } = { X: 10, Y: 10 };
 
-function formateRobotCommands(commands: string): string[] {
-  const movementCommandsArray: string[] = ["F", "B", "L", "R"];
-  let formattedMovementCommandsArray: string[] = commands
-    .toUpperCase()
-    .split("")
-    .filter((command) => movementCommandsArray.includes(command));
+export function formateRobotCommands(commands: string): string[] {
+  if (commands.length != 0) {
+    let formattedMovementCommandsArray: string[] = commands
+      .toUpperCase()
+      .split("")
+      .filter((command) => movementCommandsArray.includes(command));
 
-  return formattedMovementCommandsArray;
+    return formattedMovementCommandsArray;
+  } else {
+    return null;
+  }
 }
 
-function robotMovement(
+export function robotMovement(
   startPosition: { X: number; Y: number },
   movesArray: string[]
-): [number, number] {
+): number[] {
   let currentPosition = startPosition;
-
-  // R = X++, L = X--
-  // F = Y++, B = Y--
 
   for (let move of movesArray) {
     switch (move) {
       case "F": {
-        if (currentPosition.Y <= 0 || currentPosition.Y !== gridSize.Y) {
+        if (currentPosition.Y >= 0 && currentPosition.Y < gridSize.Y) {
           currentPosition.Y++;
+          console.log(currentPosition);
         }
         break;
       }
       case "B": {
         if (currentPosition.Y !== 0) {
           currentPosition.Y++;
+          console.log(currentPosition);
         }
         break;
       }
       case "R": {
-        if (currentPosition.X <= 0 || currentPosition.X !== gridSize.X) {
+        if (currentPosition.X >= 0 && currentPosition.X < gridSize.X) {
           currentPosition.X++;
+          console.log(currentPosition);
         }
         break;
       }
       case "L": {
         if (currentPosition.X !== 0) {
           currentPosition.X++;
+          console.log(currentPosition);
         }
         break;
       }
@@ -54,10 +59,26 @@ function robotMovement(
     }
   }
 
-  console.log(currentPosition);
+  const finalPosition = [currentPosition.X, currentPosition.Y];
 
-  return [10, 10];
+  return finalPosition;
 }
+
+// export function validMKPosition(coordinates: {
+//   X: number;
+//   Y: number;
+// }): boolean {
+//   let valid: boolean = false;
+
+//   if (coordinates.X >= 0 && coordinates.X < gridSize.X) {
+//     valid = true;
+//   }
+//   if (coordinates.Y >= 0 && coordinates.Y < gridSize.Y) {
+//     valid = true;
+//   }
+
+//   return valid;
+// }
 
 export function robotCommands(req: Request, res: Response, next: NextFunction) {
   const {
@@ -75,5 +96,5 @@ export function robotCommands(req: Request, res: Response, next: NextFunction) {
     formattedMovementCommands
   );
 
-  res.send(`this is my final postion: ${finalPosition}`);
+  res.send({ FinalPosition: finalPosition });
 }

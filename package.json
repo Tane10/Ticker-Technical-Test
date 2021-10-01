@@ -20,6 +20,8 @@
     },
     "homepage": "https://github.com/Tane10/Ticker-Technical-Test#readme",
     "dependencies": {
+        "@babel/preset-env": "^7.15.6",
+        "@babel/preset-typescript": "^7.15.0",
         "axios": "^0.21.1",
         "cors": "^2.8.5",
         "dotenv": "^8.2.0",
