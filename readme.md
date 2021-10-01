@@ -98,7 +98,8 @@ R = RIGHT
 }
 ```
 
-curl --location --request POST 'http://localhost:5000/robotspiders/commands' \
+
+curl --location --request POST 'http://localhost:5000/robotspiders/commands/1' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "startingCoordinates": {
