@@ -1,0 +1,12 @@
+version: '3'
+services:
+  ticker_technical_test:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+    - "50:5000"
+    volumes:
+    - /mnt/c/Users/josh/Ticker-Technical-Test:/usr/src/app
+volumes:
+  code: {}
