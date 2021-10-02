@@ -40,7 +40,7 @@ export interface IRobotPositionAndAxis {
 }
 
 export interface IRobotPosition extends IRobotPlacement {
-  robotLocation: Location; // Grid, Corner, Edge
+  location: Location; // Grid, Corner, Edge
   currentDirectionFacing?: Direction; // direction facing
   positionAndAxis: IRobotPositionAndAxis;
   requestedMovement?: Direction;

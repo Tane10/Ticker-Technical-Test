@@ -13,17 +13,14 @@ jest.mock("../app/services/robotSensor.service");
 jest.mock("../app/services/robotMovement.service");
 
 describe("robotSpiders.service test suit", () => {
-  let robotService: RobotService;
-  let formattedMovementCommandsArray: string[];
   const gridSize: { X: number; Y: number } = { X: 100, Y: 100 };
   const startingCoordinates: I2DVector = {
     X: 50,
     Y: 50,
   };
 
-  beforeAll(() => {
-    formattedMovementCommandsArray = validMovementCommands.split("");
-  });
+  // let robotSensorService = new RobotSensorService(gridSize);
+  // let robotMovementService = new RobotMovementService(gridSize, 2);
 
   describe("robotCommands", () => {
     test("is should return the final position for mk version 1", () => {
@@ -36,6 +33,8 @@ describe("robotSpiders.service test suit", () => {
     });
 
     test("is should return the final position for mk version 2", () => {
+      let robotSensorService = new RobotSensorService(gridSize);
+      let robotMovementService = new RobotMovementService(gridSize, 2);
       const robotServiceMk2 = new RobotService("2");
       const mk2RobotCommands = robotServiceMk2.robotCommands(
         startingCoordinates,

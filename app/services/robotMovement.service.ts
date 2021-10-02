@@ -23,7 +23,11 @@ export default class RobotMovementService {
   private calculatePosition(
     positionData: IRobotPositionAndAxis
   ): IRobotPosition {
-    let robotLocation: IRobotPosition;
+    let robotLocation: IRobotPosition = {
+      location: Location.Corner,
+      positionAndAxis: positionData,
+    };
+
     const currentDirectionFacing: Direction =
       this.robotSensorService.getDirection(positionData.rotationAxis);
 
@@ -42,12 +46,12 @@ export default class RobotMovementService {
     );
 
     if (positionedInGrid) {
-      robotLocation.robotLocation = Location.Grid;
+      robotLocation.location = Location.Grid;
     } else if (inTheCorner.switch) {
-      robotLocation.robotLocation = Location.Corner;
+      robotLocation.location = Location.Corner;
       robotLocation.side = inTheCorner.side;
     } else if (movingOnTheEdge.switch) {
-      robotLocation.robotLocation = Location.Edge;
+      robotLocation.location = Location.Edge;
       robotLocation.side = movingOnTheEdge.side;
     }
 
@@ -114,7 +118,7 @@ export default class RobotMovementService {
   private calculateForwardMovement(
     robotData: IRobotPosition
   ): IRobotPositionAndAxis {
-    if (robotData.robotLocation === Location.Grid) {
+    if (robotData.location === Location.Grid) {
       switch (robotData.currentDirectionFacing) {
         case Direction.Right: {
           robotData.positionAndAxis.position = this.increasesPosition(
@@ -145,7 +149,7 @@ export default class RobotMovementService {
           break;
         }
       }
-    } else if (robotData.robotLocation === Location.Edge) {
+    } else if (robotData.location === Location.Edge) {
       switch (robotData.side) {
         case Sides.Right: {
           if (robotData.currentDirectionFacing === Direction.Up) {
@@ -232,7 +236,7 @@ export default class RobotMovementService {
           }
         }
       }
-    } else if (robotData.robotLocation === Location.Corner) {
+    } else if (robotData.location === Location.Corner) {
       switch (robotData.side) {
         case Sides.TopRight: {
           if (robotData.currentDirectionFacing === Direction.Left) {
@@ -307,7 +311,7 @@ export default class RobotMovementService {
       robotData.currentDirectionFacing
     );
 
-    if (robotData.robotLocation === Location.Grid) {
+    if (robotData.location === Location.Grid) {
       switch (robotData.currentDirectionFacing) {
         case Direction.Right: {
           robotData.positionAndAxis.position = this.increasesPosition(
@@ -341,7 +345,7 @@ export default class RobotMovementService {
           break;
         }
       }
-    } else if (robotData.robotLocation === Location.Edge) {
+    } else if (robotData.location === Location.Edge) {
       switch (robotData.side) {
         case Sides.Right: {
           if (robotData.currentDirectionFacing === Direction.Up) {
@@ -440,7 +444,7 @@ export default class RobotMovementService {
           }
         }
       }
-    } else if (robotData.robotLocation === Location.Corner) {
+    } else if (robotData.location === Location.Corner) {
       switch (robotData.side) {
         case Sides.TopRight: {
           if (robotData.currentDirectionFacing === Direction.Up) {
