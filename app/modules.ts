@@ -31,10 +31,17 @@ export enum Sides {
 
 export interface IRobotPlacement {
   switch?: boolean;
-  side: Sides;
+  side?: Sides;
 }
 
-export interface IMoveRobot {
+export interface IRobotPositionAndAxis {
   position: I2DVector;
   rotationAxis: number;
+}
+
+export interface IRobotPosition extends IRobotPlacement {
+  robotLocation: Location; // Grid, Corner, Edge
+  currentDirectionFacing?: Direction; // direction facing
+  positionAndAxis: IRobotPositionAndAxis;
+  requestedMovement?: Direction;
 }

@@ -1,28 +1,21 @@
-import express, { Response, Request, NextFunction } from "express";
-import { Direction, I2DVector, IMoveRobot, Location } from "../modules";
-import RobotSensorService from "./RobotSensor.service";
-/**NOTE:
- * robot can't go in negative space
- * L and R now rotate 90degs
- * B we must rotate before going backwards
- * need to handle 500 robots
- *  still need to support the 500 mk1's we've got roaming around the place, so we'll need a strategy to cope with that somehow
- *
- * */
+import { Direction, I2DVector, IRobotPositionAndAxis } from "../modules";
+import RobotSensorService from "./robotSensor.service";
+import RobotMovementService from "./robotMovement.service";
 
 export default class RobotService {
   private movementCommandsArray: string[] = ["F", "B", "L", "R"];
-  private gridSize: I2DVector = { X: 10, Y: 10 };
+  private gridSize: I2DVector = { X: 100, Y: 100 };
   private robotVersion: number;
-  private standardRotation: number = 90;
   private robotSensorService: RobotSensorService;
-
-  //default assumption facing along the X axis
-  private MaxRotation: number = 0;
+  private robotMovementService: RobotMovementService;
 
   constructor(robotVersion?: string) {
     this.robotVersion = parseInt(robotVersion) || 1;
     this.robotSensorService = new RobotSensorService(this.gridSize);
+    this.robotMovementService = new RobotMovementService(
+      this.gridSize,
+      this.robotVersion
+    );
   }
 
   private formateRobotCommands(commands: string): string[] {
@@ -43,98 +36,32 @@ export default class RobotService {
     movesArray: string[]
   ): number[] {
     //default assumption facing along the X axis
-    let rotationAxis: number = 0;
-    let currentPosition = startPosition;
-    let lastMove = "";
-    let currentDirection: Direction;
-    let moveRobotAction: IMoveRobot;
-
-    // if we are facing the right way then move i.e. rotationAxis = 0
-    // if we are in the grid then move
-    // if robot version is = 1 no rotation, if greater then 1 we rotate
-    // if B & verion 2 if B -180deg then Y--
-    // if move is idx 0 the treat vairy eveyrthin g
-    // if pos % grid max != 1 or 0 then more
-
-    // verify if robot is version 1 or higher
-    // if R +90 or L -90 from rotationAxis
-    // if B -180deg then Y--
-    // F X++
-
-    // verify if robot is version 1 or higher
-    // if R +90 or L -90 from rotationAxis
-    // if B -180deg then Y--
-    // F X++
-    // depending on where axis is on where we increase when moving forward
+    let positionData: IRobotPositionAndAxis = {
+      position: startPosition,
+      rotationAxis: 0,
+    };
 
     for (const [idx, value] of movesArray.entries()) {
       switch (value) {
         case "F": {
           if (this.robotVersion !== 1) {
-            if (this.robotSensorService.positionedInGrid(currentPosition)) {
-              currentDirection =
-                this.robotSensorService.getDirection(rotationAxis);
-
-              this.robotSensorService.moveRobot(
-                currentPosition,
-                rotationAxis,
-                Location.Grid,
-                currentDirection,
-                Direction.Forward
-              );
-
-              currentPosition =
-                this.robotSensorService.newRobotPosition.position;
-
-              break;
-            } else if (
-              this.robotSensorService.inTheCorner(currentPosition, rotationAxis)
-            ) {
-              break;
-            } else if (
-              this.robotSensorService.movingOnTheEdge(
-                currentPosition,
-                rotationAxis
-              )
-            ) {
-              break;
-            } else {
-              break;
-            }
+            positionData = this.robotMovementService.moveRobot(
+              positionData,
+              Direction.Forward
+            );
           } else {
-            currentPosition.X++;
+            positionData.position.X++;
             break;
           }
         }
         case "B": {
           if (this.robotVersion !== 1) {
-            if (this.robotSensorService.positionedInGrid(currentPosition)) {
-              const newPosition = this.robotSensorService.moveBackwards(
-                currentPosition,
-                rotationAxis,
-                0
-              );
-
-              currentPosition.currentPosition.Y++;
-              break;
-            } else if (
-              this.robotSensorService.inTheCorner(currentPosition, rotationAxis)
-            ) {
-              currentPosition.Y++;
-              break;
-            } else if (
-              this.robotSensorService.movingOnTheEdge(
-                currentPosition,
-                rotationAxis
-              )
-            ) {
-              currentPosition.Y++;
-              break;
-            } else {
-              break;
-            }
+            positionData = this.robotMovementService.moveRobot(
+              positionData,
+              Direction.Backward
+            );
           } else {
-            currentPosition.X++;
+            positionData.position.X++;
             break;
           }
 
@@ -142,11 +69,16 @@ export default class RobotService {
         }
         case "R": {
           if (this.robotVersion !== 1) {
-            rotationAxis = this.robotSensorService.rotateRobot(rotationAxis, 0);
+            positionData.rotationAxis = this.robotSensorService.rotateRobot(
+              positionData.rotationAxis,
+              Direction.Right
+            );
           } else {
-            if (currentPosition.X >= 0 && currentPosition.X < this.gridSize.X) {
-              currentPosition.X++;
-              console.log(currentPosition);
+            if (
+              positionData.position.X++ >= 0 &&
+              positionData.position.X++ < this.gridSize.X
+            ) {
+              positionData.position.X++;
             }
           }
 
@@ -154,11 +86,13 @@ export default class RobotService {
         }
         case "L": {
           if (this.robotVersion !== 1) {
-            rotationAxis = this.robotSensorService.rotateRobot(rotationAxis, 1);
+            positionData.rotationAxis = this.robotSensorService.rotateRobot(
+              positionData.rotationAxis,
+              Direction.Left
+            );
           } else {
-            if (currentPosition.X !== 0) {
-              currentPosition.X++;
-              console.log(currentPosition);
+            if (positionData.position.X !== 0) {
+              positionData.position.X++;
             }
             break;
           }
@@ -168,7 +102,7 @@ export default class RobotService {
       }
     }
 
-    const finalPosition = [currentPosition.X, currentPosition.Y];
+    const finalPosition = [positionData.position.X, positionData.position.Y];
 
     return finalPosition;
   }

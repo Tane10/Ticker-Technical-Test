@@ -4,14 +4,14 @@ import {
   Direction,
   Sides,
   IRobotPlacement,
-  IMoveRobot,
+  IRobotPositionAndAxis,
 } from "../modules";
 
 export default class RobotSensorService {
   private gridSize: I2DVector;
-  public newRobotPosition: IMoveRobot;
+  public newRobotPosition: IRobotPositionAndAxis;
 
-  constructor(gridSize) {
+  constructor(gridSize: I2DVector) {
     this.gridSize = gridSize;
   }
 
@@ -205,6 +205,7 @@ export default class RobotSensorService {
     return newRotationAxis;
   }
 
+  // get direction its currently facing
   public getDirection(rotationAxis: number): Direction {
     switch (rotationAxis) {
       case 0: {
@@ -222,68 +223,5 @@ export default class RobotSensorService {
       default:
         break;
     }
-  }
-
-  public moveRobot(
-    currentPosition: I2DVector,
-    rotationAxis: number,
-    location: Location,
-    currentDirection: Direction,
-    requestedDirection: Direction
-  ): IMoveRobot {
-    if (location === Location.Grid) {
-      if (requestedDirection === Direction.Forward) {
-        switch (currentDirection) {
-          case Direction.Right: {
-            currentPosition.X++;
-            break;
-          }
-          case Direction.Up: {
-            currentPosition.Y++;
-            break;
-          }
-          case Direction.Left: {
-            currentPosition.X--;
-            break;
-          }
-          case Direction.Down: {
-            currentPosition.Y--;
-            break;
-          }
-        }
-      }
-    }
-
-    if (requestedDirection === Direction.Backward)
-      if (location === Location.Grid) {
-        rotationAxis = this.rotateRobot(rotationAxis, Direction.Backward);
-        if (rotationAxis === 0) {
-          currentPosition.X++;
-        } else if (rotationAxis === 180) {
-          currentPosition.X--;
-        } else if (rotationAxis === 90) {
-          currentPosition.Y++;
-        } else if (rotationAxis === -90) {
-          currentPosition.Y--;
-        }
-      } else if (location === Location.Corner) {
-        rotationAxis = this.rotateRobot(rotationAxis, Direction.Backwards);
-        if (currentPosition.X === 0) {
-        }
-        if (rotationAxis === 0) {
-          currentPosition.X++;
-        }
-        if (rotationAxis === 180) {
-          currentPosition.X--;
-        }
-        if (rotationAxis === 90) {
-          currentPosition.Y++;
-        }
-        if (rotationAxis === -90) {
-          currentPosition.Y--;
-        }
-      }
-
-    return this.newRobotPosition;
   }
 }
