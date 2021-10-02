@@ -108,3 +108,31 @@ curl --location --request POST 'http://localhost:5000/robotspiders/commands/1' \
     },
     "movementCommands": "FRRRFFFFRFRFFFRFFLRLFFFFLRFF"
 }'
+
+
+
+
+    // verify if robot is version 1 or higher
+    // if R +90 or L -90 from rotationAxis
+    // if B -180deg then Y--
+    // F X++
+
+    for (const [idx, value] of movement.movementCommands.entries()) {
+      switch (value) {
+        case "F": {
+          // if (currentPosition.Y >= 0 && currentPosition.Y < this.gridSize.Y) {
+          //   currentPosition.Y++;
+          //   console.log(currentPosition);
+          // }
+
+          // if we are facing the right way then move i.e. rotationAxis = 0
+          // if we are in the grid then move
+          // if robot version is = 1 no rotation, if greater then 1 we rotate
+          // if B & verion 2 if B -180deg then Y--
+          // if move is idx 0 the treat vairy eveyrthin g
+
+          if (currentPosition.Y >= 0 && currentPosition.Y < this.gridSize.Y) {
+            currentPosition.Y++;
+            console.log(currentPosition);
+          }
+          break;
